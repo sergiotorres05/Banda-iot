@@ -1,0 +1,5 @@
+flask>=3.0
+gunicorn>=22.0
+paho-mqtt>=2.0
+influxdb-client>=1.40
+PyJWT>=2.8

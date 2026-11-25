@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: riego-iot
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    # 1 worker: un solo cliente MQTT y un solo estado en memoria. 8 hilos: panel, API y worker a la vez.
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 8 --timeout 60
+    healthCheckPath: /api/status
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: MQTT_HOST
+        sync: false
+      - key: MQTT_PORT
+        value: "8883"
+      - key: MQTT_USER
+        sync: false
+      - key: MQTT_PASS
+        sync: false
+      - key: MQTT_BASE
+        value: uptc/telematica/banda01
+      - key: INFLUX_URL
+        sync: false
+      - key: INFLUX_TOKEN
+        sync: false
+      - key: INFLUX_ORG
+        sync: false
+      - key: INFLUX_BUCKET
+        value: banda
+      - key: PANEL_USER
+        sync: false
+      - key: PANEL_CLAVE
+        sync: false

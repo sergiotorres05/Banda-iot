@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0A0F15">
+<title>Entrar · Banda de monitoreo</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0E141B;color:#E3E9EF;font:15px/1.45 "IBM Plex Sans",Roboto,system-ui,-apple-system,"Segoe UI",sans-serif}
+form{width:min(380px,92vw);background:#151D26;border:1px solid #2A3644;border-radius:6px;padding:26px}
+h1{margin:0 0 4px;font:600 22px "IBM Plex Sans Condensed","Roboto Condensed","Arial Narrow",sans-serif}
+p{margin:0 0 18px;color:#9AA8B6}
+label{display:block;font-size:14px;margin:12px 0 6px}
+input{width:100%;min-height:46px;border:1px solid #2A3644;border-radius:4px;padding:0 12px;font:inherit;background:#0F161E;color:#E3E9EF}
+input:focus-visible,button:focus-visible{outline:3px solid #4FB3E8;outline-offset:2px}
+button{width:100%;min-height:50px;margin-top:18px;border:0;border-radius:4px;background:#E3E9EF;color:#0E141B;font:600 17px "IBM Plex Sans Condensed","Arial Narrow",sans-serif;cursor:pointer}
+button[disabled]{opacity:.6;cursor:default}
+.err{color:#FFC2C9;margin:12px 0 0;font-size:14px;min-height:20px}
+small{display:block;margin-top:14px;color:#7D8B99;font-size:12px}
+</style>
+</head>
+<body>
+<form id="f">
+  <h1>Banda de monitoreo</h1>
+  <p>Panel IoT · acceso con token JWT</p>
+  <label for="usuario">Usuario</label>
+  <input id="usuario" name="usuario" autocomplete="username" required autofocus>
+  <label for="clave">Contraseña</label>
+  <input id="clave" name="clave" type="password" autocomplete="current-password" required>
+  <p class="err" id="err" role="alert"></p>
+  <button id="btn" type="submit">Ingresar</button>
+  <small>La sesión dura 8 horas y se cierra al cerrar la pestaña.</small>
+</form>
+<script>
+document.getElementById('f').addEventListener('submit', function (ev) {
+  ev.preventDefault();
+  const btn = document.getElementById('btn'), err = document.getElementById('err');
+  btn.disabled = true; err.textContent = '';
+  fetch('/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ usuario: document.getElementById('usuario').value, clave: document.getElementById('clave').value })
+  }).then(r => r.json().then(j => ({ ok: r.ok, j })))
+    .then(({ ok, j }) => {
+      if (!ok) throw new Error(j.error || 'No se pudo ingresar');
+      try { sessionStorage.setItem('jwt', j.token); } catch (e) {}
+      location.replace('/');
+    })
+    .catch(e => { err.textContent = e.message; btn.disabled = false; });
+});
+</script>
+</body>
+</html>
